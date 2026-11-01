@@ -1,0 +1,21 @@
+# Big model weights: hosted as a GitHub Release asset, downloaded during the Railway build
+*.safetensors
+*.bin
+*.pt
+checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Secrets (never commit)
+.env
+kaggle.json
+*.key
+
+# OS / editor
+.DS_Store
+.vscode/
