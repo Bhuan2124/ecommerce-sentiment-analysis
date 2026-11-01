@@ -19,11 +19,12 @@ RUN pip install -r requirements-railway.txt
 
 COPY . .
 
-# The fine-tuned DistilBERT weights (268 MB) are too big for a normal GitHub file,
-# so they are kept as a GitHub Release asset and downloaded while the image is built.
-ARG DISTILBERT_URL=https://github.com/Bhuan2124/ecommerce-sentiment-analysis/releases/download/model-v1/model.safetensors
-RUN if [ ! -f models/distilbert/model.safetensors ]; then \
-      curl -fL --retry 5 -o models/distilbert/model.safetensors "$DISTILBERT_URL"; \
+# The fine-tuned DistilBERT weights (268 MB) are stored with Git LFS. If the build only got the small
+# LFS pointer file instead of the real weights, download the real file from GitHub's LFS media URL.
+ARG DISTILBERT_URL=https://media.githubusercontent.com/media/Bhuan2124/ecommerce-sentiment-analysis/main/models/distilbert/model.safetensors
+RUN f=models/distilbert/model.safetensors; \
+    if [ ! -f "$f" ] || [ "$(stat -c %s "$f")" -lt 1000000 ]; then \
+      curl -fL --retry 5 -o "$f" "$DISTILBERT_URL"; \
     fi && ls -lh models/distilbert
 
 EXPOSE 8080

@@ -1,5 +1,4 @@
 # Big model weights: hosted as a GitHub Release asset, downloaded during the Railway build
-*.safetensors
 *.bin
 *.pt
 checkpoints/
