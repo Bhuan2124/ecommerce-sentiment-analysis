@@ -21,7 +21,7 @@ COPY . .
 
 # The fine-tuned DistilBERT weights (268 MB) are too big for a normal GitHub file,
 # so they are kept as a GitHub Release asset and downloaded while the image is built.
-ARG DISTILBERT_URL=https://github.com/saud142/ecommerce-sentiment-analysis/releases/download/model-v1/model.safetensors
+ARG DISTILBERT_URL=https://github.com/Bhuan2124/ecommerce-sentiment-analysis/releases/download/model-v1/model.safetensors
 RUN if [ ! -f models/distilbert/model.safetensors ]; then \
       curl -fL --retry 5 -o models/distilbert/model.safetensors "$DISTILBERT_URL"; \
     fi && ls -lh models/distilbert
