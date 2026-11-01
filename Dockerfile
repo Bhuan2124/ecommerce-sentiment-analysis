@@ -19,13 +19,12 @@ RUN pip install -r requirements-railway.txt
 
 COPY . .
 
-# The fine-tuned DistilBERT weights (268 MB) are stored with Git LFS. If the build only got the small
-# LFS pointer file instead of the real weights, download the real file from GitHub's LFS media URL.
-ARG DISTILBERT_URL=https://media.githubusercontent.com/media/Bhuan2124/ecommerce-sentiment-analysis/main/models/distilbert/model.safetensors
-RUN f=models/distilbert/model.safetensors; \
-    if [ ! -f "$f" ] || [ "$(stat -c %s "$f")" -lt 1000000 ]; then \
-      curl -fL --retry 5 -o "$f" "$DISTILBERT_URL"; \
-    fi && ls -lh models/distilbert
+# The fine-tuned DistilBERT weights (268 MB) are bigger than GitHub's 100 MB file limit, so they are
+# stored as 45 MB pieces in models/distilbert/parts/ and joined back together here.
+RUN cd models/distilbert && \
+    if [ ! -f model.safetensors ]; then cat parts/model.safetensors.part* > model.safetensors; fi && \
+    echo "$(cat parts/SHA256)  model.safetensors" | sha256sum -c - && \
+    rm -rf parts && ls -lh
 
 EXPOSE 8080
 CMD ["sh", "-c", "streamlit run app.py --server.port=${PORT:-8080} --server.address=0.0.0.0 --server.headless=true --browser.gatherUsageStats=false"]

@@ -18,3 +18,4 @@ kaggle.json
 # OS / editor
 .DS_Store
 .vscode/
+*.safetensors
