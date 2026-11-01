@@ -19,6 +19,37 @@ if str(ROOT) not in sys.path:
 
 import streamlit as st  # noqa: E402
 
+
+def _assemble_distilbert() -> None:
+    """GitHub limits files to 100 MB, so the 268 MB DistilBERT weights are stored as pieces in
+    models/distilbert/parts/. Join them into model.safetensors once, the first time the app starts."""
+    import hashlib
+    ddir = ROOT / "models" / "distilbert"
+    target, parts_dir = ddir / "model.safetensors", ddir / "parts"
+    if target.is_file() or not parts_dir.is_dir():
+        return
+    parts = sorted(parts_dir.glob("model.safetensors.part*"))
+    if not parts:
+        return
+    tmp = target.with_suffix(".tmp")
+    digest = hashlib.sha256()
+    with open(tmp, "wb") as out:
+        for part in parts:
+            data = part.read_bytes()
+            digest.update(data)
+            out.write(data)
+    expected = (parts_dir / "SHA256").read_text().strip() if (parts_dir / "SHA256").is_file() else None
+    if expected and digest.hexdigest() != expected:
+        tmp.unlink(missing_ok=True)
+        return
+    tmp.replace(target)
+
+
+try:
+    _assemble_distilbert()
+except OSError:
+    pass  # DistilBERT will simply show as "pending"; the classical models still work
+
 st.set_page_config(page_title="Sentiment Analysis of E-Commerce Reviews", layout="wide", initial_sidebar_state="expanded")
 
 from webapp import artifacts, inference  # noqa: E402

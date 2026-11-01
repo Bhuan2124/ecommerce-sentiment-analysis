@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
 # PyTorch CPU build (much smaller than the default CUDA build)
 RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-COPY requirements-railway.txt .
-RUN pip install -r requirements-railway.txt
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 COPY . .
 
